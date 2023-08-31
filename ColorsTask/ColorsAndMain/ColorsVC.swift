@@ -43,11 +43,6 @@ class ColorsVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
          let cell = tableView.dequeueReusableCell(withIdentifier: "ColorTableViewCell", for: indexPath) as! ColorTableViewCell
 
         // Configure the cell based on the color object
-       /* let color = colors[indexPath.row]
-        cell.textLabel?.text = color.name
-        cell.detailTextLabel?.text = color.description
-        cell.backgroundColor = color.getUIColor() // Set the background color based on value*/
-        
         let color = colors[indexPath.row]
         cell.myLabel.text = color.name
         cell.detailTextLabel?.text = color.description
