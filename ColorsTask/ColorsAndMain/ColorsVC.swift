@@ -12,6 +12,7 @@ class ColorsVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
     var expandedCellIndex: Int? = nil
     @IBOutlet weak var ViewColor: UIView!
     @IBOutlet weak var colorDescriptionLabel: UILabel!
+    @IBOutlet weak var tableView: UITableView!
     
     enum Cells {
         static let colorCell = "ColorCell"
@@ -20,6 +21,11 @@ class ColorsVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
     override func viewDidLoad() {
         super.viewDidLoad()
         addColors()
+        
+        let nib = UINib(nibName: "ColorTableViewCell", bundle: nil)
+        tableView.register(nib, forCellReuseIdentifier: "ColorTableViewCell")
+        tableView.delegate = self
+        tableView.dataSource = self
         
     }
     
@@ -34,15 +40,19 @@ class ColorsVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: Cells.colorCell) else {
-            return UITableViewCell()
-        }
-        
+         let cell = tableView.dequeueReusableCell(withIdentifier: "ColorTableViewCell", for: indexPath) as! ColorTableViewCell
+
         // Configure the cell based on the color object
-        let color = colors[indexPath.row]
+       /* let color = colors[indexPath.row]
         cell.textLabel?.text = color.name
         cell.detailTextLabel?.text = color.description
-        cell.backgroundColor = color.getUIColor() // Set the background color based on value
+        cell.backgroundColor = color.getUIColor() // Set the background color based on value*/
+        
+        let color = colors[indexPath.row]
+        cell.myLabel.text = color.name
+        cell.detailTextLabel?.text = color.description
+        cell.backgroundColor = color.getUIColor()
+        
     
         
         return cell
