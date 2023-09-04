@@ -13,25 +13,23 @@ class ColorsVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
     @IBOutlet weak var ViewColor: UIView!
     @IBOutlet weak var colorDescriptionLabel: UILabel!
     @IBOutlet weak var tableView: UITableView!
-    
-    enum Cells {
-        static let colorCell = "ColorCell"
-    }
+    @IBOutlet weak var editBarButton: UIBarButtonItem!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         addColors()
+        loadReorderedColors()
+        
         
         let nib = UINib(nibName: "ColorTableViewCell", bundle: nil)
         tableView.register(nib, forCellReuseIdentifier: "ColorTableViewCell")
         tableView.delegate = self
         tableView.dataSource = self
-        
+        tableView.isEditing = false
     }
     
     func addColors() {
         colors = Colors.allColors
-        
     }
 
     
@@ -47,8 +45,6 @@ class ColorsVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
         cell.myLabel.text = color.name
         cell.detailTextLabel?.text = color.description
         cell.backgroundColor = color.getUIColor()
-        
-    
         
         return cell
     }
@@ -67,5 +63,70 @@ class ColorsVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
         colorDescriptionLabel.textColor = UIColor.black
         
     }
+    
+    //Functions that reorder and remove cells
+    //Allows reordering of cells
+    func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+            return true
+    }
+
+    // Allows cell to be reorders to another place
+    func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        let item = colors[sourceIndexPath.row] // let the item equal to the index that is going to be reordered in colors
+        colors.remove(at: sourceIndexPath.row) // the chosen index will be removed
+        colors.insert(item, at: destinationIndexPath.row) // and reordered in the destination that the user chose
+        
+        saveReorderedColors() // save colors after being reordered
+    }
+
+    
+    //Functions to save the user's reorder
+    let userDefaultsKey = "ReorderedColors"
+
+    // Function to save the reordered colors
+        func saveReorderedColors() {
+            do {
+                // Use JSONEncoder to encode the colors array to Data
+                let encoder = JSONEncoder()
+                let encodedData = try encoder.encode(colors)
+                
+                // Save the encoded data to UserDefaults
+                UserDefaults.standard.set(encodedData, forKey: userDefaultsKey)
+            } catch {
+                print("Error encoding colors: \(error.localizedDescription)")
+            }
+        }
+    
+    // Function to load the reordered colors
+        func loadReorderedColors(){
+            if let encodedData = UserDefaults.standard.data(forKey: userDefaultsKey){
+                do {
+                    // Use JSONDecoder to decode the colors array from Data
+                    let decoder = JSONDecoder()
+                    let decodedColors = try decoder.decode([Color].self, from: encodedData)
+                    self.colors = decodedColors
+                    tableView.reloadData()
+                } catch {
+                    print("Error decoding colors: \(error.localizedDescription)")
+                }
+            }
+        }
+    
+    // removes the delete button that shows by default
+    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        return .none
+    }
+    
+    @IBAction func edit(_ sender: Any) {
+        tableView.isEditing = !tableView.isEditing
+
+        switch tableView.isEditing {
+        case true:
+            editBarButton.title = "Done"
+        case false:
+            editBarButton.title = "Edit"
+        }
+    }
+ 
 }
 

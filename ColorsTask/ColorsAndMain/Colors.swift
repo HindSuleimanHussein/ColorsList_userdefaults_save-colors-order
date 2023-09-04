@@ -7,7 +7,7 @@
 
 import UIKit
 
-struct Color {
+struct Color: Codable {
     var value: Int
     var name: String
     var description: String
